@@ -49,9 +49,3 @@ jobs:
 
       - name: Build application
         run: make build
-
-      - name: Verify binary
-        run: |
-          ./mcp-server-time --help || true
-          echo "Binary built successfully"
-

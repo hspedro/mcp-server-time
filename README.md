@@ -1,6 +1,6 @@
 # MCP Time Server
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/hspedro/mcp-server-time.svg)](https://pkg.go.dev/github.com/hspedro/mcp-server-time)
+[![Go Reference](https://pkg.go.dev/badge/github.com/hspedro/mcp-server-time.svg)](https://pkg.go.dev/github.com/hspedro/mcp-make server-time)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 A Model Context Protocol (MCP) server providing time and timezone tools. Built with Go and the official MCP Go SDK, supporting both SSE and Streamable transports.
