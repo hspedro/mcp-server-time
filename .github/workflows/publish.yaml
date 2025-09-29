@@ -10,9 +10,12 @@ env:
   IMAGE_NAME: hspedro/mcp-server-time
 
 jobs:
-  build-amd64:
-    name: Build for linux/amd64
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,14 +30,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push amd64 image
+      - name: Build and push multi-arch image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-amd64
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
             VERSION=${{ github.ref_name }}
             BUILD_TIME=${{ github.run_id }}
@@ -42,71 +47,7 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: false
 
-  build-arm64:
-    name: Build for linux/arm64
-    runs-on: ubuntu-22.04-arm
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push arm64 image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/arm64
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-arm64
-          build-args: |
-            VERSION=${{ github.ref_name }}
-            BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: false
-
-  push-manifest:
-    name: Push multi-arch manifest
-    runs-on: ubuntu-latest
-    needs: [build-amd64, build-arm64]
-    steps:
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create and push manifest
+      - name: Inspect image
         run: |
-          # Create manifest pointing to architecture-specific images
-          docker manifest create ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} \
-            --amend ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-amd64 \
-            --amend ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-arm64
-
-          # Push manifest to registry
-          docker manifest push ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-
-      - name: Create and push latest manifest
-        run: |
-          # Create latest manifest pointing to architecture-specific images
-          docker manifest create ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest \
-            --amend ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-amd64 \
-            --amend ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-arm64
-
-          # Push latest manifest to registry
-          docker manifest push ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
-
-      - name: Inspect manifests
-        run: |
-          docker manifest inspect ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-          docker manifest inspect ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
