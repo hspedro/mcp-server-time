@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/hspedro/mcp-server-time)](https://goreportcard.com/report/github.com/hspedro/mcp-server-time)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-A high-performance Model Context Protocol (MCP) server providing comprehensive time and timezone tools. Built with Go and the official MCP Go SDK, supporting both SSE and Streamable transports for maximum compatibility.
+A Model Context Protocol (MCP) server providing time and timezone tools. Built with Go and the official MCP Go SDK, supporting both SSE and Streamable transports.
 
 ## Features
 
