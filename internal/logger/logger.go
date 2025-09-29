@@ -12,7 +12,7 @@ import (
 // New creates a new zap logger based on the provided configuration
 func New(cfg config.LogConfig) (*zap.Logger, error) {
 	level := parseLogLevel(cfg.Level)
-	
+
 	var logger *zap.Logger
 	var err error
 
