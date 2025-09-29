@@ -61,23 +61,23 @@ func TestLoad(t *testing.T) {
 		{
 			name: "invalid timezone should fail validation",
 			setupEnv: func() {
-				os.Setenv("MCP_DEFAULT_TIMEZONE", "Invalid/Timezone")
+				os.Setenv("MCP_SERVER_TIME_TIME_DEFAULT_TIMEZONE", "Invalid/Timezone")
 			},
 			wantErr: true,
 		},
 		{
 			name: "invalid log level should fail validation",
 			setupEnv: func() {
-				os.Setenv("MCP_LOGGING_LEVEL", "invalid")
+				os.Setenv("MCP_SERVER_TIME_LOGGING_LEVEL", "invalid")
 			},
 			wantErr: true,
 		},
 		{
 			name: "same port for server and metrics should fail",
 			setupEnv: func() {
-				os.Setenv("MCP_SERVER_PORT", "8080")
-				os.Setenv("MCP_METRICS_PORT", "8080")
-				os.Setenv("MCP_METRICS_ENABLED", "true")
+				os.Setenv("MCP_SERVER_TIME_SERVER_PORT", "8080")
+				os.Setenv("MCP_SERVER_TIME_METRICS_PORT", "8080")
+				os.Setenv("MCP_SERVER_TIME_METRICS_ENABLED", "true")
 			},
 			wantErr: true,
 		},
@@ -90,8 +90,8 @@ func TestLoad(t *testing.T) {
 
 			// Clear environment
 			envVars := []string{
-				"MCP_SERVER_PORT", "MCP_SERVER_HOST", "MCP_TIME_DEFAULT_TIMEZONE",
-				"MCP_LOGGING_LEVEL", "MCP_METRICS_ENABLED", "MCP_METRICS_PORT",
+				"MCP_SERVER_TIME_SERVER_PORT", "MCP_SERVER_TIME_SERVER_HOST", "MCP_SERVER_TIME_TIME_DEFAULT_TIMEZONE",
+				"MCP_SERVER_TIME_LOGGING_LEVEL", "MCP_SERVER_TIME_METRICS_ENABLED", "MCP_SERVER_TIME_METRICS_PORT",
 			}
 			for _, env := range envVars {
 				os.Unsetenv(env)
