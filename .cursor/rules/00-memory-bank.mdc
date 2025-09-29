@@ -1,0 +1,181 @@
+---
+alwaysApply: true
+---
+# Cursor Rules for MCP Time Server
+
+## CRITICAL: Required Reading Before Any Analysis
+
+You MUST read these files before analyzing any user request:
+
+1. **docs/tech_context.md** - Complete MCP patterns and Go architecture
+2. **docs/agent_workflow.md** - Mandatory workflow process for all changes
+3. **docs/CLAUDE.md** - Project overview and quick reference
+
+## Mandatory Workflow Process
+
+Follow the agent_workflow.md process for ALL changes:
+
+### Phase 1: Context Loading
+- Read tech_context.md for MCP patterns and architecture understanding
+- Read relevant feature documentation based on request
+- Understand current implementation before proposing changes
+
+### Phase 2: Analysis & Planning
+- Analyze user request against MCP protocol requirements
+- Check for breaking changes and backward compatibility
+- Consider impact on time service, handlers, and transport layers
+
+### Phase 3: Comprehensive Planning
+**CRITICAL**: Create and present a complete plan including:
+
+1. **Code Changes**: Time Service → Handlers → Transports order
+2. **Testing Strategy**: Unit tests with mocks, integration tests
+3. **Configuration Updates**: YAML config and environment variables
+4. **Documentation Changes**: Code docs, README, technical docs
+5. **Development Workflow**: make commands and quality gates
+6. **MCP Compliance**: Protocol adherence and client compatibility
+
+### Phase 4: User Validation
+**NEVER make changes without user approval of the plan.**
+
+Present plan with:
+- Clear summary of changes
+- Implementation steps in order
+- MCP protocol impact assessment
+- Testing approach
+- Integration considerations
+
+### Phase 5: Implementation
+Only after user approval:
+1. Implement in time-service-first order
+2. Write comprehensive tests with mocks
+3. Update configuration and documentation
+4. Run quality gates: `make fmt lint test mocks build`
+
+## Architecture Requirements
+
+### MCP Protocol Compliance
+- **Tool Schemas**: Follow MCP standard schema definitions
+- **Transport Layer**: Support both SSE and Streamable transports
+- **Error Handling**: Return MCP-compliant error responses
+- **Content Types**: Use proper MCP content types (text, etc.)
+
+### Clean Architecture Compliance
+- **Time Service**: No external dependencies, interfaces only
+- **Handler Layer**: MCP concerns only, no business logic
+- **Transport Layer**: Protocol-specific implementations
+- **Dependencies flow inward**: Handlers → Time Service
+
+### Code Quality Standards
+- Use interface-based design for testability
+- Handle time operations with proper timezone awareness
+- Add structured logging with context
+- Write tests for all time functionality
+- Validate all time inputs thoroughly
+
+### Configuration Management
+- All settings in YAML with environment variable overrides
+- Container-friendly configuration
+- Default values provided in code
+- Documentation updated for new variables
+
+### Development Practices
+- Use Makefile for all commands
+- Follow Go best practices and conventions
+- Use testify for testing and mockgen for mocks
+- Maintain documentation alongside code changes
+
+## Quality Gates
+
+Before considering work complete:
+- [ ] `make fmt` - Code formatting
+- [ ] `make lint` - Linting passes
+- [ ] `make test` - All tests pass
+- [ ] `make mocks` - Mocks regenerated
+- [ ] `make build` - Build succeeds
+- [ ] Documentation updated
+- [ ] Configuration examples valid
+- [ ] MCP protocol compliance verified
+
+## Library Preferences
+
+- **MCP Go SDK**: Official SDK for MCP protocol implementation
+- **Viper**: Configuration management
+- **Zap**: Structured logging
+- **Prometheus**: Metrics collection (exclude Go runtime metrics)
+- **Testify**: Testing and assertions
+- **Mockgen**: Mock generation for interfaces
+- **Standard library**: Prefer over external frameworks for time operations
+
+## Anti-Patterns to Avoid
+
+- Making changes without following the workflow
+- Skipping user validation of plans
+- Business logic in handlers
+- External dependencies in time service
+- Missing tests for time operations
+- Hardcoded timezone or format values
+- Unstructured logging
+- Global state or singletons
+
+## File Structure Awareness
+
+This is a standalone MCP server project:
+- Root directory contains main.go, config.yaml, Makefile
+- internal/ directory for internal packages
+- docs/ directory for documentation
+- GitHub Actions for CI/CD (not GitLab)
+- Docker support for containerization
+
+## MCP-Specific Guidelines
+
+### Tool Implementation
+- Always validate input schemas according to MCP standards
+- Return proper MCP content types (text, image, etc.)
+- Handle errors gracefully with user-friendly messages
+- Document tool capabilities clearly in schemas
+
+### Time Operations
+- Always validate timezone names against IANA database
+- Support common time formats (RFC3339, Unix, etc.)
+- Handle edge cases like DST transitions
+- Provide clear error messages for invalid inputs
+
+### Transport Implementation
+- Support both SSE and Streamable for maximum compatibility
+- Implement proper health checks for monitoring
+- Handle concurrent requests efficiently
+- Maintain protocol compliance in all responses
+
+### Testing Patterns
+- Test time operations with various timezones
+- Test tool schemas for validation
+- Test error scenarios and responses
+- Use mocks for external dependencies
+- Test transport behavior under different conditions
+
+## Remember
+
+**ALWAYS PLAN FIRST, GET APPROVAL, THEN IMPLEMENT**
+
+The agent_workflow.md process is mandatory for maintaining code quality, MCP protocol compliance, and proper project governance.
+
+## Time-Specific Considerations
+
+### Timezone Handling
+- Always use IANA timezone database
+- Handle UTC vs local time correctly
+- Consider DST transitions
+- Validate timezone names before use
+
+### Format Handling
+- Support standard formats (RFC3339, Unix timestamps)
+- Allow custom Go time layouts
+- Validate formats before parsing/formatting
+- Provide helpful error messages
+
+### Edge Cases
+- Handle leap seconds appropriately
+- Consider timezone boundary conditions
+- Test with various date ranges
+- Handle invalid time inputs gracefully

@@ -27,6 +27,14 @@ go.work.sum
 # env file
 .env
 
+# Development build directory
+tmp/
+build-errors.log
+
+# Binary output
+mcp-server-time
+main
+
 # Editor/IDE
 # .idea/
 # .vscode/
